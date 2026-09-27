@@ -135,6 +135,9 @@ public class FactionEventHandler {
         if (faction == Faction.STEAMPUNK && TerritoryManager.isInOwnTerritory(player)) {
             player.addEffect(new net.minecraft.world.effect.MobEffectInstance(
                     net.minecraft.world.effect.MobEffects.HEALTH_BOOST, 60, 1, false, false, true));
+        if (faction == Faction.NOVIZNA && TerritoryManager.isInOwnTerritory(player)) {
+            NoviznaEnergyBuff.apply(player);
+        }
         }
     }
 
