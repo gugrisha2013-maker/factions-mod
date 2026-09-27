@@ -97,6 +97,27 @@ public class FactionEventHandler {
             }
             player.setItemInHand(hand, net.minecraft.world.item.ItemStack.EMPTY);
             blockedMessage(player, id);
+
+        for (net.minecraft.world.entity.EquipmentSlot slot : new net.minecraft.world.entity.EquipmentSlot[]{
+                net.minecraft.world.entity.EquipmentSlot.HEAD,
+                net.minecraft.world.entity.EquipmentSlot.CHEST,
+                net.minecraft.world.entity.EquipmentSlot.LEGS,
+                net.minecraft.world.entity.EquipmentSlot.FEET}) {
+            net.minecraft.world.item.ItemStack worn = player.getItemBySlot(slot);
+            if (worn.isEmpty()) continue;
+
+            ResourceLocation id = BuiltInRegistries.ITEM.getKey(worn.getItem());
+            if (FactionManager.canUse(player, id)) continue;
+
+            player.setItemSlot(slot, net.minecraft.world.item.ItemStack.EMPTY);
+            if (!player.getInventory().add(worn.copy())) {
+                player.drop(worn.copy(), false);
+            }
+            blockedMessage(player, id);
+        }
+
+        if (net.neoforged.fml.ModList.get().isLoaded("curios")) {
+            CuriosIntegration.enforce(player);
         }
     }
 
