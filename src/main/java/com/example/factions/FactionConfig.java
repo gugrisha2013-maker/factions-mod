@@ -17,7 +17,8 @@ public class FactionConfig {
     public static final ModConfigSpec.ConfigValue<List<? extends String>> NOVIZNA_MODS;
     public static final ModConfigSpec.ConfigValue<List<? extends String>> STEAMPUNK_MODS;
     public static final ModConfigSpec.ConfigValue<List<? extends String>> MAGIC_MODS;
-
+    public static final ModConfigSpec.DoubleValue SPAWN_RADIUS;
+    public static final ModConfigSpec.DoubleValue ROTATION_OFFSET;
     static {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
         builder.push("factions");
