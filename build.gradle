@@ -22,6 +22,10 @@ repositories {
         name = "TheIllusiveC4 Maven"
         url = "https://maven.theillusivec4.top/"
     }
+    maven {
+    name = "Modrinth"
+    url = "https://api.modrinth.com/maven"
+}
 }
 
 base {
@@ -64,6 +68,7 @@ dependencies {
     implementation "net.neoforged:neoforge:${neo_version}"
 
     compileOnly "top.theillusivec4.curios:curios-neoforge:9.5.1+1.21.1"
+    compileOnly "com.hollingsworth.arsnouveau:ars_nouveau-1.21.1-neoforge:5.13.1:api"
 }
 
 tasks.withType(ProcessResources).configureEach {
