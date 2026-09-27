@@ -42,6 +42,13 @@ public class FactionConfig {
                         "ars_nouveau", "irons_spellbooks", "wizards", "runes", "spell_engine", "spell_power"
                 ), o -> o instanceof String);
 
+       SPAWN_RADIUS = builder
+                .comment("Радиус нейтральной зоны спауна в блоках")
+                .defineInRange("spawnRadius", 50.0, 0.0, 100000.0);
+
+        ROTATION_OFFSET = builder
+                .comment("Поворот границ треугольников в градусах (0 = магия с 0° до 120°, дальше по часовой)")
+                .defineInRange("rotationOffset", 0.0, 0.0, 360.0);
         builder.pop();
         SPEC = builder.build();
     }
