@@ -122,6 +122,72 @@ public class FactionEventHandler {
         }
     }
 
+    private static final double BORDER_VIEW_DISTANCE = 40.0;
+    private static final double PARTICLE_STEP = 2.0;
+    private static final double LINE_LENGTH = 30.0;
+
+    @SubscribeEvent
+    public static void onFactionBuffs(net.neoforged.neoforge.event.tick.PlayerTickEvent.Post event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        if (player.tickCount % 20 != 0) return;
+
+        Faction faction = FactionManager.get(player);
+        if (faction == Faction.STEAMPUNK && TerritoryManager.isInOwnTerritory(player)) {
+            player.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+                    net.minecraft.world.effect.MobEffects.HEALTH_BOOST, 60, 1, false, false, true));
+        }
+    }
+
+    @SubscribeEvent
+    public static void onBorderParticles(net.neoforged.neoforge.event.tick.PlayerTickEvent.Post event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        if (player.tickCount % 40 != 0) return;
+        if (!(player.level() instanceof net.minecraft.server.level.ServerLevel level)) return;
+
+        double x = player.getX();
+        double z = player.getZ();
+        double y = player.getY() + 1.0;
+
+        double spawnRadius = FactionConfig.SPAWN_RADIUS.get();
+        double dist = Math.sqrt(x * x + z * z);
+
+        if (Math.abs(dist - spawnRadius) < BORDER_VIEW_DISTANCE) {
+            double playerAngle = Math.atan2(z, x);
+            double angularStep = PARTICLE_STEP / spawnRadius;
+            double angularRange = LINE_LENGTH / spawnRadius;
+            for (double a = -angularRange; a <= angularRange; a += angularStep) {
+                double angle = playerAngle + a;
+                double px = Math.cos(angle) * spawnRadius;
+                double pz = Math.sin(angle) * spawnRadius;
+                level.sendParticles(player, net.minecraft.core.particles.ParticleTypes.END_ROD, false,
+                        px, y, pz, 1, 0, 0, 0, 0);
+            }
+        }
+
+        double offset = Math.toRadians(FactionConfig.ROTATION_OFFSET.get());
+        for (int i = 0; i < 3; i++) {
+            double lineAngle = offset + Math.toRadians(120.0 * i);
+            double dx = Math.cos(lineAngle);
+            double dz = Math.sin(lineAngle);
+
+            double t = x * dx + z * dz;
+            if (t < spawnRadius) continue;
+
+            double projX = dx * t;
+            double projZ = dz * t;
+            double perpDist = Math.sqrt((x - projX) * (x - projX) + (z - projZ) * (z - projZ));
+            if (perpDist > BORDER_VIEW_DISTANCE) continue;
+
+            for (double s = t - LINE_LENGTH; s <= t + LINE_LENGTH; s += PARTICLE_STEP) {
+                if (s < spawnRadius) continue;
+                double px = dx * s;
+                double pz = dz * s;
+                level.sendParticles(player, net.minecraft.core.particles.ParticleTypes.END_ROD, false,
+                        px, y, pz, 1, 0, 0, 0, 0);
+            }
+        }
+    }
+
     @SubscribeEvent
     public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
