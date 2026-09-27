@@ -2,6 +2,7 @@ package com.example.factions.mixin;
 
 import com.example.factions.Faction;
 import com.example.factions.FactionManager;
+import com.example.factions.FactionConfig;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -50,7 +51,7 @@ public class CraftingGuardMixin {
         ResourceLocation id = BuiltInRegistries.ITEM.getKey(result.getItem());
         if (id == null) return;
 
-        Faction owner = Faction.ownerOf(id.toString());
+        Faction owner = FactionConfig.ownerOf(id.toString());
         if (owner == null) return; // общий предмет — можно всем
 
         if (FactionManager.get(serverPlayer) != owner) {
