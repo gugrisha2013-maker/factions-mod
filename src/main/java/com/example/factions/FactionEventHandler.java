@@ -137,6 +137,9 @@ public class FactionEventHandler {
                     net.minecraft.world.effect.MobEffects.HEALTH_BOOST, 60, 1, false, false, true));
         if (faction == Faction.NOVIZNA && TerritoryManager.isInOwnTerritory(player)) {
             NoviznaEnergyBuff.apply(player);
+        if (faction == Faction.MAGIC && TerritoryManager.isInOwnTerritory(player)) {
+            ArsNouveauManaBuff.apply(player);
+        }
         }
         }
     }
