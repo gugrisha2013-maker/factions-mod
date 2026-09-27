@@ -51,7 +51,7 @@ public class FactionManager {
      * Может ли игрок пользоваться предметом/блоком с данным registry id.
      */
     public static boolean canUse(ServerPlayer player, ResourceLocation id) {
-        Faction owner = Faction.ownerOf(id.toString());
+        Faction owner = FactionConfig.ownerOf(id.toString());
         if (owner == null) return true; // общий предмет — доступен всем
         return owner == get(player);
     }
