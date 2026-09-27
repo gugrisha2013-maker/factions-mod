@@ -1,0 +1,16 @@
+package com.example.factions;
+
+import com.hollingsworth.arsnouveau.api.capability.CapabilityRegistry;
+import com.hollingsworth.arsnouveau.api.capability.IPlayerCap;
+import net.minecraft.server.level.ServerPlayer;
+
+class ArsNouveauManaBuff {
+    private static final int BONUS_MANA_PER_SECOND = 20; // подбери под баланс
+
+    static void apply(ServerPlayer player) {
+        player.getCapability(CapabilityRegistry.MANA_CAPABILITY).ifPresent(cap -> {
+            int newMana = Math.min(cap.getMaxMana(), cap.getCurrentMana() + BONUS_MANA_PER_SECOND);
+            cap.setMana(newMana);
+        });
+    }
+}
