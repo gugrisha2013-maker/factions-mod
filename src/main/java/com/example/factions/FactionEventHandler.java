@@ -97,7 +97,8 @@ public class FactionEventHandler {
             }
             player.setItemInHand(hand, net.minecraft.world.item.ItemStack.EMPTY);
             blockedMessage(player, id);
-
+        }
+            
         for (net.minecraft.world.entity.EquipmentSlot slot : new net.minecraft.world.entity.EquipmentSlot[]{
                 net.minecraft.world.entity.EquipmentSlot.HEAD,
                 net.minecraft.world.entity.EquipmentSlot.CHEST,
