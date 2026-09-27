@@ -1,5 +1,6 @@
 package com.example.factions;
 
+import com.example.factions.FactionConfig;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.commands.Commands;
@@ -54,6 +55,47 @@ public class FactionEventHandler {
         ResourceLocation id = BuiltInRegistries.BLOCK.getKey(event.getPlacedBlock().getBlock());
         if (!FactionManager.canUse(player, id)) {
             event.setCanceled(true);
+            blockedMessage(player, id);
+        }
+    }
+    
+    @SubscribeEvent
+    public static void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        ResourceLocation id = BuiltInRegistries.ENTITY_TYPE.getKey(event.getTarget().getType());
+        if (!FactionManager.canUse(player, id)) {
+            event.setCanceled(true);
+            blockedMessage(player, id);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onMount(net.neoforged.neoforge.event.entity.EntityMountEvent event) {
+        if (!event.isMounting()) return;
+        if (!(event.getEntityMounting() instanceof ServerPlayer player)) return;
+        ResourceLocation id = BuiltInRegistries.ENTITY_TYPE.getKey(event.getEntityBeingMounted().getType());
+        if (!FactionManager.canUse(player, id)) {
+            event.setCanceled(true);
+            blockedMessage(player, id);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerTick(net.neoforged.neoforge.event.tick.PlayerTickEvent.Post event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        if (player.tickCount % 20 != 0) return;
+
+        for (net.minecraft.world.InteractionHand hand : net.minecraft.world.InteractionHand.values()) {
+            net.minecraft.world.item.ItemStack held = player.getItemInHand(hand);
+            if (held.isEmpty()) continue;
+
+            ResourceLocation id = BuiltInRegistries.ITEM.getKey(held.getItem());
+            if (FactionManager.canUse(player, id)) continue;
+
+            if (!player.getInventory().add(held.copy())) {
+                player.drop(held.copy(), false);
+            }
+            player.setItemInHand(hand, net.minecraft.world.item.ItemStack.EMPTY);
             blockedMessage(player, id);
         }
     }
@@ -130,7 +172,7 @@ public class FactionEventHandler {
     }
 
     static void blockedMessage(ServerPlayer player, ResourceLocation id) {
-        Faction owner = Faction.ownerOf(id.toString());
+        Faction owner = FactionConfig.ownerOf(id.toString());
         String ownerName = owner != null ? owner.displayName : "другой фракции";
         player.sendSystemMessage(Component.literal("Это относится к фракции «" + ownerName + "». Тебе недоступно."));
     }
