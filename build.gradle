@@ -65,7 +65,7 @@ dependencies {
     implementation "net.neoforged:neoforge:${neo_version}"
 
     compileOnly "top.theillusivec4.curios:curios-neoforge:9.5.1+1.21.1"
-    compileOnly "com.hollingsworth.ars_nouveau:ars_nouveau-1.21.1-neoforge:5.13.1"
+    compileOnly "com.hollingsworth.ars_nouveau:ars_nouveau-1.21.1:5.13.1"
 }
 
 tasks.withType(ProcessResources).configureEach {
