@@ -22,7 +22,10 @@ repositories {
         name = "TheIllusiveC4 Maven"
         url = "https://maven.theillusivec4.top/"
     }
-    maven { url 'https://maven.blamejared.com' }
+    maven {
+        name = "BlameJared Maven"
+        url = "https://maven.blamejared.com"
+    }
 }
 
 base {
@@ -65,7 +68,10 @@ dependencies {
     implementation "net.neoforged:neoforge:${neo_version}"
 
     compileOnly "top.theillusivec4.curios:curios-neoforge:9.5.1+1.21.1"
-    compileOnly "com.hollingsworth.ars_nouveau:ars_nouveau-1.21.1:5.13.1"
+
+    compileOnly("com.hollingsworth.ars_nouveau:ars_nouveau-1.21.1:5.13.+") {
+        transitive = false
+    }
 }
 
 tasks.withType(ProcessResources).configureEach {
