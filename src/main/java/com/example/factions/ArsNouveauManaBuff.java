@@ -1,6 +1,6 @@
 package com.example.factions;
 
-import com.hollingsworth.arsnouveau.api.capability.CapabilityRegistry;
+import com.hollingsworth.arsnouveau.setup.registry.CapabilityRegistry;
 import net.minecraft.server.level.ServerPlayer;
 
 class ArsNouveauManaBuff {
