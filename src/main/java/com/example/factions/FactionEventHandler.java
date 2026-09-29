@@ -127,12 +127,10 @@ public class FactionEventHandler {
         }
 
         if (faction == Faction.NOVIZNA && TerritoryManager.isInOwnTerritory(player)) {
-            player.sendSystemMessage(Component.literal("[debug] проверка Новизны запущена"));
             NoviznaEnergyBuff.apply(player);
         }
 
         if (faction == Faction.MAGIC && TerritoryManager.isInOwnTerritory(player)) {
-            player.sendSystemMessage(Component.literal("[debug] проверка Магии запущена"));
             ArsNouveauManaBuff.apply(player);
         }
     }
@@ -254,6 +252,25 @@ public class FactionEventHandler {
                             return 1;
                         }))
                     )
+                )
+        );
+
+        event.getDispatcher().register(
+            Commands.literal("city")
+                .then(Commands.literal("create")
+                    .then(Commands.argument("name", StringArgumentType.word()).executes(ctx -> {
+                        ServerPlayer player = ctx.getSource().getPlayerOrException();
+                        String name = StringArgumentType.getString(ctx, "name");
+
+                        if (CityManager.exists(name)) {
+                            ctx.getSource().sendFailure(Component.literal("Город с таким названием уже есть."));
+                            return 0;
+                        }
+
+                        CityManager.create(name, player.getUUID());
+                        ctx.getSource().sendSuccess(() -> Component.literal("Город «" + name + "» создан. Ты мэр."), false);
+                        return 1;
+                    }))
                 )
         );
     }
