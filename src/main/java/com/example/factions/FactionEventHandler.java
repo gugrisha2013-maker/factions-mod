@@ -1,31 +1,19 @@
 package com.example.factions;
 
-import com.example.factions.FactionConfig;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 
-/**
- * Аналог основной части старого factions.js: блокировка ПКМ по чужим блокам/предметам,
- * блокировка установки чужих блоков, приветствие при входе, команда /faction.
- *
- * Крафт-блокировка (самое важное — без потери ингредиентов при отказе) сделана
- * отдельно в FactionCraftMixin, потому что событий, которые срабатывают ДО списания
- * ингредиентов крафта, в обычном (не-mixin) API NeoForge нет.
- */
 @EventBusSubscriber(modid = FactionsMod.MODID)
 public class FactionEventHandler {
 
@@ -58,7 +46,7 @@ public class FactionEventHandler {
             blockedMessage(player, id);
         }
     }
-    
+
     @SubscribeEvent
     public static void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
@@ -98,7 +86,7 @@ public class FactionEventHandler {
             player.setItemInHand(hand, net.minecraft.world.item.ItemStack.EMPTY);
             blockedMessage(player, id);
         }
-            
+
         for (net.minecraft.world.entity.EquipmentSlot slot : new net.minecraft.world.entity.EquipmentSlot[]{
                 net.minecraft.world.entity.EquipmentSlot.HEAD,
                 net.minecraft.world.entity.EquipmentSlot.CHEST,
@@ -132,15 +120,20 @@ public class FactionEventHandler {
         if (player.tickCount % 20 != 0) return;
 
         Faction faction = FactionManager.get(player);
+
         if (faction == Faction.STEAMPUNK && TerritoryManager.isInOwnTerritory(player)) {
             player.addEffect(new net.minecraft.world.effect.MobEffectInstance(
                     net.minecraft.world.effect.MobEffects.HEALTH_BOOST, 60, 1, false, false, true));
+        }
+
         if (faction == Faction.NOVIZNA && TerritoryManager.isInOwnTerritory(player)) {
+            player.sendSystemMessage(Component.literal("[debug] проверка Новизны запущена"));
             NoviznaEnergyBuff.apply(player);
+        }
+
         if (faction == Faction.MAGIC && TerritoryManager.isInOwnTerritory(player)) {
+            player.sendSystemMessage(Component.literal("[debug] проверка Магии запущена"));
             ArsNouveauManaBuff.apply(player);
-        }
-        }
         }
     }
 
@@ -235,7 +228,7 @@ public class FactionEventHandler {
                     }))
                 )
                 .then(Commands.literal("admin")
-                    .requires(src -> src.hasPermission(2)) // только оператор
+                    .requires(src -> src.hasPermission(2))
                     .then(Commands.literal("set")
                         .then(Commands.argument("target", EntityArgument.player())
                             .then(Commands.argument("id", StringArgumentType.word()).executes(ctx -> {
