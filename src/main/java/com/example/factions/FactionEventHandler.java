@@ -37,16 +37,19 @@ public class FactionEventHandler {
         }
     }
 
-    @SubscribeEvent
+       @SubscribeEvent
     public static void onBlockPlace(BlockEvent.EntityPlaceEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        checkCityAccess(event, player, event.getPos());
+        if (event.isCanceled()) return;
+
         ResourceLocation id = BuiltInRegistries.BLOCK.getKey(event.getPlacedBlock().getBlock());
         if (!FactionManager.canUse(player, id)) {
             event.setCanceled(true);
             blockedMessage(player, id);
         }
     }
-
+    
         @SubscribeEvent
     public static void onCityBlockBreak(net.neoforged.neoforge.event.level.BlockEvent.BreakEvent event) {
         if (!(event.getPlayer() instanceof ServerPlayer player)) return;
