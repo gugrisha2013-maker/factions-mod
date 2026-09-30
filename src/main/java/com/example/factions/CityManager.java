@@ -25,4 +25,12 @@ public class CityManager {
     public static City cityAt(ServerLevel level, ChunkPos pos) {
         return CitySavedData.get(level).cityAt(pos);
     }
+
+        public static City cityOf(ServerLevel level, UUID player) {
+        return CitySavedData.get(level).cityOf(player);
+    }
+
+    public static void markDirty(ServerLevel level) {
+        CitySavedData.get(level).setDirty();
+    }
 }
