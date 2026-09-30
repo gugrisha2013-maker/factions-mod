@@ -13,10 +13,12 @@ public class City {
     public final String name;
     public UUID mayor;
     public final Set<Long> claimedChunks = new HashSet<>();
+    public final Set<UUID> members = new HashSet<>();
 
     public City(String name, UUID mayor) {
         this.name = name;
         this.mayor = mayor;
+        this.members.add(mayor);
     }
 
     public void claim(ChunkPos pos) {
@@ -25,6 +27,10 @@ public class City {
 
     public boolean owns(ChunkPos pos) {
         return claimedChunks.contains(pos.toLong());
+    }
+
+    public boolean isMember(UUID player) {
+        return members.contains(player);
     }
 
     public CompoundTag save() {
@@ -36,6 +42,13 @@ public class City {
             chunks.add(LongTag.valueOf(c));
         }
         tag.put("chunks", chunks);
+        ListTag membersTag = new ListTag();
+        for (UUID m : members) {
+            CompoundTag mTag = new CompoundTag();
+            mTag.putUUID("id", m);
+            membersTag.add(mTag);
+        }
+        tag.put("members", membersTag);
         return tag;
     }
 
@@ -44,6 +57,13 @@ public class City {
         ListTag chunks = tag.getList("chunks", 4);
         for (int i = 0; i < chunks.size(); i++) {
             city.claimedChunks.add(((LongTag) chunks.get(i)).getAsLong());
+        }
+        if (tag.contains("members")) {
+            city.members.clear();
+            ListTag membersTag = tag.getList("members", 10);
+            for (int i = 0; i < membersTag.size(); i++) {
+                city.members.add(membersTag.getCompound(i).getUUID("id"));
+            }
         }
         return city;
     }
