@@ -255,20 +255,22 @@ public class FactionEventHandler {
                 )
         );
 
-        event.getDispatcher().register(
+               event.getDispatcher().register(
             Commands.literal("city")
                 .then(Commands.literal("create")
                     .then(Commands.argument("name", StringArgumentType.word()).executes(ctx -> {
                         ServerPlayer player = ctx.getSource().getPlayerOrException();
+                        net.minecraft.server.level.ServerLevel level = ctx.getSource().getLevel();
                         String name = StringArgumentType.getString(ctx, "name");
 
-                        if (CityManager.exists(name)) {
+                        if (CityManager.exists(level, name)) {
                             ctx.getSource().sendFailure(Component.literal("Город с таким названием уже есть."));
                             return 0;
                         }
 
-                        CityManager.create(name, player.getUUID());
-                        ctx.getSource().sendSuccess(() -> Component.literal("Город «" + name + "» создан. Ты мэр."), false);
+                        net.minecraft.world.level.ChunkPos chunk = new net.minecraft.world.level.ChunkPos(player.blockPosition());
+                        CityManager.create(level, name, player.getUUID(), chunk);
+                        ctx.getSource().sendSuccess(() -> Component.literal("Город «" + name + "» создан. Ты мэр. Чанк застолблён."), false);
                         return 1;
                     }))
                 )
