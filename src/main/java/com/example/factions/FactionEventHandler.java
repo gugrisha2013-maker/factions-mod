@@ -56,7 +56,7 @@ public class FactionEventHandler {
         checkCityAccess(event, player, event.getPos());
     }
 
-    private static void checkCityAccess(net.neoforged.neoforge.event.level.BlockEvent event, ServerPlayer player, net.minecraft.core.BlockPos pos) {
+      private static <T extends net.neoforged.bus.api.Event & net.neoforged.bus.api.ICancellableEvent> void checkCityAccess(T event, ServerPlayer player, net.minecraft.core.BlockPos pos) {
         net.minecraft.server.level.ServerLevel level = (net.minecraft.server.level.ServerLevel) player.level();
         net.minecraft.world.level.ChunkPos chunk = new net.minecraft.world.level.ChunkPos(pos);
         City city = CityManager.cityAt(level, chunk);
