@@ -1,21 +1,28 @@
 package com.example.factions;
 
-import java.util.HashMap;
-import java.util.Map;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.ChunkPos;
+
 import java.util.UUID;
 
 public class CityManager {
-    private static final Map<String, City> CITIES = new HashMap<>();
 
-    public static boolean exists(String name) {
-        return CITIES.containsKey(name.toLowerCase());
+    public static boolean exists(ServerLevel level, String name) {
+        return CitySavedData.get(level).exists(name);
     }
 
-    public static void create(String name, UUID mayor) {
-        CITIES.put(name.toLowerCase(), new City(name, mayor));
+    public static City create(ServerLevel level, String name, UUID mayor, ChunkPos startingChunk) {
+        City city = CitySavedData.get(level).create(name, mayor);
+        city.claim(startingChunk);
+        CitySavedData.get(level).setDirty();
+        return city;
     }
 
-    public static City get(String name) {
-        return CITIES.get(name.toLowerCase());
+    public static City get(ServerLevel level, String name) {
+        return CitySavedData.get(level).get(name);
+    }
+
+    public static City cityAt(ServerLevel level, ChunkPos pos) {
+        return CitySavedData.get(level).cityAt(pos);
     }
 }
