@@ -66,6 +66,42 @@ public class FactionEventHandler {
         event.setCanceled(true);
         player.sendSystemMessage(Component.literal("Этот участок принадлежит городу «" + city.name + "»."));
     }
+
+        @SubscribeEvent
+    public static void onExplosion(net.neoforged.neoforge.event.level.ExplosionEvent.Detonate event) {
+        if (!(event.getLevel() instanceof net.minecraft.server.level.ServerLevel level)) return;
+
+        event.getAffectedBlocks().removeIf(pos -> {
+            net.minecraft.world.level.ChunkPos chunk = new net.minecraft.world.level.ChunkPos(pos);
+            return CityManager.cityAt(level, chunk) != null;
+        });
+    }
+
+    private static final java.util.Map<java.util.UUID, String> LAST_ZONE = new java.util.HashMap<>();
+
+    @SubscribeEvent
+    public static void onZoneNotify(net.neoforged.neoforge.event.tick.PlayerTickEvent.Post event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        if (player.tickCount % 20 != 0) return;
+        if (!(player.level() instanceof net.minecraft.server.level.ServerLevel level)) return;
+
+        net.minecraft.world.level.ChunkPos chunk = new net.minecraft.world.level.ChunkPos(player.blockPosition());
+        City city = CityManager.cityAt(level, chunk);
+
+        String zone;
+        if (city != null) {
+            zone = "Город «" + city.name + "»";
+        } else {
+            Faction territory = TerritoryManager.territoryAt(player.getX(), player.getZ());
+            zone = territory != null ? "Территория «" + territory.displayName + "»" : "Нейтральный спаун";
+        }
+
+        String previous = LAST_ZONE.get(player.getUUID());
+        if (!zone.equals(previous)) {
+            LAST_ZONE.put(player.getUUID(), zone);
+            player.sendSystemMessage(Component.literal("Вы вошли: " + zone));
+        }
+    }
     
     @SubscribeEvent
     public static void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
