@@ -47,6 +47,23 @@ public class FactionEventHandler {
         }
     }
 
+        @SubscribeEvent
+    public static void onCityBlockBreak(net.neoforged.neoforge.event.level.BlockEvent.BreakEvent event) {
+        if (!(event.getPlayer() instanceof ServerPlayer player)) return;
+        checkCityAccess(event, player, event.getPos());
+    }
+
+    private static void checkCityAccess(net.neoforged.neoforge.event.level.BlockEvent event, ServerPlayer player, net.minecraft.core.BlockPos pos) {
+        net.minecraft.server.level.ServerLevel level = (net.minecraft.server.level.ServerLevel) player.level();
+        net.minecraft.world.level.ChunkPos chunk = new net.minecraft.world.level.ChunkPos(pos);
+        City city = CityManager.cityAt(level, chunk);
+        if (city == null) return;
+        if (city.isMember(player.getUUID())) return;
+
+        event.setCanceled(true);
+        player.sendSystemMessage(Component.literal("Этот участок принадлежит городу «" + city.name + "»."));
+    }
+    
     @SubscribeEvent
     public static void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
