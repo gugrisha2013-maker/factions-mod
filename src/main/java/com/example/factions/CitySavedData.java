@@ -55,6 +55,13 @@ public class CitySavedData extends SavedData {
         return data;
     }
 
+        public City cityOf(UUID player) {
+        for (City city : cities.values()) {
+            if (city.isMember(player)) return city;
+        }
+        return null;
+    }
+    
     @Override
     public CompoundTag save(CompoundTag tag, net.minecraft.core.HolderLookup.Provider provider) {
         ListTag list = new ListTag();
