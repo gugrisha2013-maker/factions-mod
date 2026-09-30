@@ -24,6 +24,10 @@ public class City {
     public void claim(ChunkPos pos) {
         claimedChunks.add(pos.toLong());
     }
+    
+        public int chunkLimit() {
+        return 25 + 25 * (members.size() - 1);
+    }
 
     public boolean owns(ChunkPos pos) {
         return claimedChunks.contains(pos.toLong());
