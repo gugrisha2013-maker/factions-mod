@@ -293,6 +293,35 @@ public class FactionEventHandler {
                         ctx.getSource().sendSuccess(() -> Component.literal("Город «" + name + "» создан. Ты мэр. Чанк застолблён."), false);
                         return 1;
                     }))
+                      
+                                      .then(Commands.literal("claim").executes(ctx -> {
+                    ServerPlayer player = ctx.getSource().getPlayerOrException();
+                    net.minecraft.server.level.ServerLevel level = ctx.getSource().getLevel();
+                    net.minecraft.world.level.ChunkPos chunk = new net.minecraft.world.level.ChunkPos(player.blockPosition());
+
+                    City city = CityManager.cityOf(level, player.getUUID());
+                    if (city == null) {
+                        ctx.getSource().sendFailure(Component.literal("Ты не состоишь в городе."));
+                        return 0;
+                    }
+                    if (!city.mayor.equals(player.getUUID())) {
+                        ctx.getSource().sendFailure(Component.literal("Только мэр может клеймить чанки."));
+                        return 0;
+                    }
+                    if (city.owns(chunk)) {
+                        ctx.getSource().sendFailure(Component.literal("Этот чанк уже твой."));
+                        return 0;
+                    }
+                    if (city.claimedChunks.size() >= city.chunkLimit()) {
+                        ctx.getSource().sendFailure(Component.literal("Лимит чанков исчерпан (" + city.chunkLimit() + ")."));
+                        return 0;
+                    }
+
+                    city.claim(chunk);
+                    CityManager.markDirty(level);
+                    ctx.getSource().sendSuccess(() -> Component.literal("Чанк застолблён (" + city.claimedChunks.size() + "/" + city.chunkLimit() + ")."), false);
+                    return 1;
+                }))
                 )
         );
     }
