@@ -102,6 +102,22 @@ public class FactionEventHandler {
             player.sendSystemMessage(Component.literal("Вы вошли: " + zone));
         }
     }
+
+        @SubscribeEvent
+    public static void onFluidSpread(net.neoforged.neoforge.event.level.BlockEvent.FluidPlaceBlockEvent event) {
+        if (!(event.getLevel() instanceof net.minecraft.server.level.ServerLevel level)) return;
+
+        net.minecraft.world.level.ChunkPos targetChunk = new net.minecraft.world.level.ChunkPos(event.getPos());
+        net.minecraft.world.level.ChunkPos sourceChunk = new net.minecraft.world.level.ChunkPos(event.getFluidPos());
+
+        City targetCity = CityManager.cityAt(level, targetChunk);
+        if (targetCity == null) return;
+
+        City sourceCity = CityManager.cityAt(level, sourceChunk);
+        if (targetCity.equals(sourceCity)) return;
+
+        event.setCanceled(true);
+    }
     
     @SubscribeEvent
     public static void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
