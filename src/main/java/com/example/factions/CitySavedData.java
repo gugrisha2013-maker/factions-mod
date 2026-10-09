@@ -38,9 +38,21 @@ public class CitySavedData extends SavedData {
         return city;
     }
 
+    public void remove(String name) {
+        cities.remove(name.toLowerCase());
+        setDirty();
+    }
+
     public City cityAt(net.minecraft.world.level.ChunkPos pos) {
         for (City city : cities.values()) {
             if (city.owns(pos)) return city;
+        }
+        return null;
+    }
+
+    public City cityOf(UUID player) {
+        for (City city : cities.values()) {
+            if (city.isMember(player)) return city;
         }
         return null;
     }
@@ -55,13 +67,6 @@ public class CitySavedData extends SavedData {
         return data;
     }
 
-        public City cityOf(UUID player) {
-        for (City city : cities.values()) {
-            if (city.isMember(player)) return city;
-        }
-        return null;
-    }
-    
     @Override
     public CompoundTag save(CompoundTag tag, net.minecraft.core.HolderLookup.Provider provider) {
         ListTag list = new ListTag();
